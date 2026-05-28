@@ -686,7 +686,7 @@
 
     <section class="card" style="margin-top:18px;">
       <h2>Backup + Share Progress</h2>
-      <p class="hint">Backup saves a file you can restore later. Copy Summary gives Dad an easy update to paste into ChatGPT.</p>
+      <p class="hint">Backup saves a file you can restore later. Copy Summary gives Dad an easy update to see your progress.</p>
 
       <div class="button-grid">
         <button class="secondary" id="exportButton" type="button">⬇️ Backup Runs</button>
@@ -1094,7 +1094,7 @@
 
       try {
         await navigator.clipboard.writeText(summary);
-        setStatus("Progress summary copied. Paste it into ChatGPT when you want coaching.");
+        setStatus("Progress summary copied. Send it to Dad to show your progress.");
       } catch {
         window.prompt("Copy this progress summary:", summary);
         setStatus("Copy the summary from the popup.");
