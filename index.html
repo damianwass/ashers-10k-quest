@@ -1,0 +1,1628 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asher's 10K Quest Tracker</title>
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root {
+      --bg1: #ecfeff;
+      --bg2: #ffffff;
+      --bg3: #ecfdf5;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --card: rgba(255,255,255,.92);
+      --line: #e2e8f0;
+      --soft: #f8fafc;
+      --dark: #020617;
+      --good: #10b981;
+      --sky: #38bdf8;
+      --violet: #8b5cf6;
+      --danger: #ef4444;
+      --shadow: 0 12px 30px rgba(15, 23, 42, .08);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, var(--bg1), transparent 30rem),
+        radial-gradient(circle at bottom right, var(--bg3), transparent 28rem),
+        var(--bg2);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .hero {
+      background: var(--dark);
+      color: white;
+      border-radius: 34px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+
+    @media (min-width: 900px) {
+      .hero { grid-template-columns: 1fr auto; align-items: center; padding: 34px; }
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: rgba(255,255,255,.1);
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    h1 {
+      font-size: clamp(38px, 7vw, 68px);
+      line-height: .94;
+      margin: 16px 0 12px;
+      letter-spacing: -0.05em;
+    }
+
+    h2 { font-size: 26px; margin: 0; letter-spacing: -0.02em; }
+    p { margin: 0; }
+
+    .hero p {
+      max-width: 760px;
+      color: #cbd5e1;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .countdown {
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.1);
+      border-radius: 28px;
+      padding: 22px;
+      min-width: 210px;
+    }
+
+    .countdown .label {
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .countdown .days {
+      font-size: 54px;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .stats { grid-template-columns: 1fr; }
+    @media (min-width: 720px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+
+    .main-grid { grid-template-columns: 1fr; }
+    @media (min-width: 960px) { .main-grid { grid-template-columns: 2fr 1fr; } }
+
+    .lower-grid { grid-template-columns: 1fr; }
+    @media (min-width: 960px) { .lower-grid { grid-template-columns: 2fr 1fr; } }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 5px 18px rgba(15, 23, 42, .04);
+    }
+
+    .stat {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: #f1f5f9;
+      font-size: 24px;
+      flex: 0 0 auto;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .stat .value {
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .stat .sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 650px) {
+      .row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    select, input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+      padding: 13px 14px;
+      color: var(--ink);
+      font-weight: 700;
+      outline: none;
+    }
+
+    textarea { resize: vertical; min-height: 94px; }
+    label span { display: block; font-size: 13px; font-weight: 900; color: #475569; margin-bottom: 6px; }
+
+    .plan-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media (min-width: 760px) { .plan-cards { grid-template-columns: repeat(3, 1fr); } }
+
+    .plan-card {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .plan-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .plan-top .title {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .badge-small {
+      background: white;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .workout {
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+
+    .quest-card { margin-top: 18px; }
+
+    .quest-message {
+      margin: 14px 0 16px;
+      border: 1px solid #bae6fd;
+      background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+      border-radius: 22px;
+      padding: 14px 16px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .quest-message-label {
+      color: #0369a1;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .quest-message-text {
+      color: #0f172a;
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: 850;
+    }
+
+
+    .message-card {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: start;
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+    }
+
+    .message-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: #eef2ff;
+      font-size: 26px;
+      flex: 0 0 auto;
+    }
+
+    .message-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+      font-weight: 950;
+      margin-bottom: 6px;
+    }
+
+    .message-text {
+      font-size: 20px;
+      line-height: 1.25;
+      font-weight: 950;
+      letter-spacing: -0.02em;
+    }
+
+    .message-subtext {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .progress-card { margin-top: 18px; }
+    .progress-card .progress-box { margin-top: 0; }
+
+
+    .quest-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 930px) {
+      .quest-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .workout-card {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 24px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 100%;
+    }
+
+    .workout-card.complete { border-color: #bbf7d0; background: #f0fdf4; }
+    .workout-card.incomplete { border-color: #fde68a; background: #fffbeb; }
+    .workout-card.skipped { border-color: #cbd5e1; background: #f8fafc; }
+    .workout-card.none { border-color: var(--line); background: var(--soft); }
+
+    .plan-title {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: 12px;
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 950;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .status-pill.complete { color: #047857; border-color: #bbf7d0; background: #ecfdf5; }
+    .status-pill.incomplete { color: #92400e; border-color: #fde68a; background: #fffbeb; }
+    .status-pill.skipped { color: #475569; border-color: #cbd5e1; background: #f8fafc; }
+    .status-pill.none { color: var(--muted); border-color: var(--line); background: white; }
+
+    .status-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .status-button {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 16px;
+      padding: 10px 8px;
+      font-size: 12px;
+      font-weight: 950;
+      color: #334155;
+    }
+
+    .status-button.active.complete { background: #10b981; color: white; border-color: #10b981; }
+    .status-button.active.incomplete { background: #f59e0b; color: white; border-color: #f59e0b; }
+    .status-button.active.skipped { background: #0f172a; color: white; border-color: #0f172a; }
+
+    .completion-form {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .save-workout {
+      width: 100%;
+      border: 0;
+      background: var(--dark);
+      color: white;
+      border-radius: 18px;
+      padding: 14px;
+      font-weight: 950;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+    }
+
+    .complete-summary {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      color: #166534;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .tiny-note { color: var(--muted); font-size: 12px; line-height: 1.35; }
+
+    .progress-box {
+      margin-top: 18px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 900;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      height: 16px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--good), var(--sky), var(--violet));
+      transition: width .45s ease;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .feelings {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .feeling {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 18px;
+      padding: 9px 7px;
+      font-size: 13px;
+      font-weight: 950;
+      color: var(--ink);
+    }
+
+    .feeling.active {
+      background: var(--dark);
+      color: white;
+      border-color: var(--dark);
+    }
+
+    .feeling .emoji {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 2px;
+    }
+
+    .primary {
+      width: 100%;
+      border: 0;
+      background: var(--dark);
+      color: white;
+      border-radius: 20px;
+      padding: 16px;
+      font-weight: 950;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+    }
+
+    .primary:active { transform: scale(.99); }
+
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-weight: 950;
+    }
+
+    .secondary:active { transform: scale(.99); }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (min-width: 560px) {
+      .button-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .log-empty {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 36px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .log-empty .shoe { font-size: 44px; margin-bottom: 8px; }
+    .log-empty b { color: var(--ink); }
+
+    .run-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .run {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (min-width: 700px) {
+      .run {
+        grid-template-columns: 1fr auto;
+        align-items: start;
+      }
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .run-main {
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .run-date {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .run-notes {
+      margin-top: 8px;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .delete {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 16px;
+      padding: 11px 13px;
+      color: var(--muted);
+      font-weight: 950;
+    }
+
+    .delete:hover { color: var(--danger); }
+
+    .badges {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .badge-card {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 22px;
+      padding: 15px;
+      display: flex;
+      gap: 13px;
+    }
+
+    .badge-card.unlocked {
+      background: white;
+      border-color: #bbf7d0;
+    }
+
+    .badge-card.locked {
+      color: #94a3b8;
+    }
+
+    .badge-card.locked .badge-emoji {
+      filter: grayscale(1);
+      opacity: .55;
+    }
+
+    .badge-emoji { font-size: 30px; }
+    .badge-title { font-weight: 950; }
+    .badge-detail { font-size: 14px; margin-top: 3px; }
+    .badge-status {
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .table-card { overflow: hidden; }
+    .table-wrap { overflow-x: auto; margin-top: 12px; }
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+
+    td {
+      background: var(--soft);
+      padding: 14px 12px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    td:first-child { border-radius: 16px 0 0 16px; font-size: 16px; font-weight: 950; }
+    td:last-child { border-radius: 0 16px 16px 0; }
+    .date-cell { color: var(--muted); font-weight: 700; }
+    .hint { color: var(--muted); font-size: 14px; margin-top: 12px; line-height: 1.35; }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="pill">🔥 Rock ’n’ Roll San Jose 10K Quest</div>
+        <h1>Asher’s 10K Tracker</h1>
+        <p>Mission: run 6.2 miles, feel strong, have fun, and make Dad question his life choices in the final sprint.</p>
+      </div>
+      <div class="countdown">
+        <div class="label">Race countdown</div>
+        <div class="days" id="raceDays">—</div>
+        <p>days until final boss day</p>
+      </div>
+    </section>
+
+    <section class="grid stats">
+      <div class="card stat">
+        <div class="icon">👟</div>
+        <div>
+          <div class="label">Miles Logged</div>
+          <div class="value" id="totalMiles">0.0</div>
+          <div class="sub">Complete + partial efforts</div>
+        </div>
+      </div>
+
+      <div class="card stat">
+        <div class="icon">🏆</div>
+        <div>
+          <div class="label">Longest Run</div>
+          <div class="value" id="longestRun">0.0 mi</div>
+          <div class="sub">Goal: 6.2 miles</div>
+        </div>
+      </div>
+
+      <div class="card stat">
+        <div class="icon">📅</div>
+        <div>
+          <div class="label">Runs Logged</div>
+          <div class="value" id="runsLogged">0</div>
+          <div class="sub">Consistency wins</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card message-card" id="weeklyMessageBox">
+      <div class="message-icon">⚡</div>
+      <div>
+        <div class="message-label" id="messageLabel">Weekly Power Up</div>
+        <div class="message-text" id="messageText">Show up. That’s how quests begin.</div>
+        <div class="message-subtext" id="messageSubtext">This week is about getting started and building momentum.</div>
+      </div>
+    </section>
+
+    <section class="card progress-card">
+      <div class="progress-box">
+        <div>
+          <div class="progress-label">
+            <span>Progress to 6.2 miles</span>
+            <span id="tenKPct">0%</span>
+          </div>
+          <div class="bar"><div class="fill" id="tenKFill"></div></div>
+        </div>
+
+        <div>
+          <div class="progress-label">
+            <span>Dad Danger Meter</span>
+            <span id="dadPct">0%</span>
+          </div>
+          <div class="bar"><div class="fill" id="dadFill"></div></div>
+        </div>
+
+        <p class="hint">Tap a planned run, mark it complete, then add date, time, feeling, and notes. Mileage is pulled from the plan. For range workouts, the tracker uses the top end for mileage stats.</p>
+      </div>
+    </section>
+
+
+    <section class="card quest-card">
+      <div>
+        <h2>This Week’s Quest</h2>
+        <p class="hint" id="weekSubhead">Week —</p>
+<select id="weekSelect" aria-label="Select week"></select>
+
+        <div class="quest-message">
+          <div class="quest-message-label">Power Up</div>
+          <div class="quest-message-text" id="weeklyMessage">Every mile is a vote for the runner you’re becoming.</div>
+        </div>
+
+      </div>
+
+      <div class="quest-grid" id="questGrid"></div>
+
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>Backup + Share Progress</h2>
+      <p class="hint">Backup saves a file you can restore later. Copy Summary gives Dad an easy update to paste into ChatGPT.</p>
+
+      <div class="button-grid">
+        <button class="secondary" id="exportButton" type="button">⬇️ Backup Runs</button>
+        <button class="secondary" id="importButton" type="button">⬆️ Restore Backup</button>
+        <button class="secondary" id="summaryButton" type="button">📋 Copy Summary</button>
+      </div>
+
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none;" />
+      <div class="status" id="backupStatus"></div>
+    </section>
+
+    <section class="grid lower-grid">
+      <div class="card">
+        <div class="row">
+          <div>
+            <h2>Run Log</h2>
+            <p class="hint">Most recent runs show first.</p>
+          </div>
+          <div style="font-size:24px;">⏱️</div>
+        </div>
+        <div id="runList" class="run-list"></div>
+      </div>
+
+      <div class="card">
+        <h2>🏅 Badges</h2>
+        <div class="badges" id="badges"></div>
+      </div>
+    </section>
+
+    <section class="card table-card" style="margin-top:18px;">
+      <h2>⚡ Full 18-Week Plan</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th>Dates</th>
+              <th>Easy</th>
+              <th>Long</th>
+              <th>Optional</th>
+            </tr>
+          </thead>
+          <tbody id="planTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const RACE_DATE = new Date("2026-10-04T08:00:00");
+    const PLAN_START = new Date("2026-06-01T00:00:00");
+
+    const TRAINING_PLAN = [
+      { week: 1, easy: "2.0–2.5 mi", long: "3.5 mi", optional: "20 min easy" },
+      { week: 2, easy: "2.5 mi", long: "3.75 mi", optional: "6 short fast bursts" },
+      { week: 3, easy: "2.5 mi", long: "4.0 mi", optional: "20–25 min easy" },
+      { week: 4, easy: "2.0 mi", long: "3.25 mi", optional: "Rest / bike / play" },
+      { week: 5, easy: "2.75 mi", long: "4.25 mi", optional: "6 quick bursts" },
+      { week: 6, easy: "3.0 mi", long: "4.5 mi", optional: "20–25 min easy" },
+      { week: 7, easy: "2.5 mi", long: "3.75 mi", optional: "Trail walk/jog" },
+      { week: 8, easy: "3.0 mi", long: "4.75 mi", optional: "6 quick bursts" },
+      { week: 9, easy: "3.25 mi", long: "5.0 mi", optional: "25 min easy" },
+      { week: 10, easy: "2.5 mi", long: "4.0 mi", optional: "Fun activity" },
+      { week: 11, easy: "3.25 mi", long: "5.25 mi", optional: "6 quick bursts" },
+      { week: 12, easy: "3.5 mi", long: "5.5 mi", optional: "25 min easy" },
+      { week: 13, easy: "3.0 mi", long: "4.5 mi", optional: "Fun run" },
+      { week: 14, easy: "3.5 mi", long: "5.75 mi", optional: "Short fast bursts" },
+      { week: 15, easy: "3.5 mi", long: "6.0 mi", optional: "20 min easy" },
+      { week: 16, easy: "3.0 mi", long: "6.2 mi practice", optional: "Rest" },
+      { week: 17, easy: "2.5 mi", long: "4.0 mi relaxed", optional: "15–20 min easy" },
+      { week: 18, easy: "2.0 mi easy", long: "RACE DAY: 10K", optional: "Victory lap" },
+    ];
+
+    const FEELINGS = [
+      { label: "Easy", emoji: "😎" },
+      { label: "Medium", emoji: "🔥" },
+      { label: "Hard", emoji: "🥵" },
+      { label: "6-7", emoji: "🫡" },
+    ];
+
+
+    const WEEKLY_MESSAGES = [
+      { title: "Week 1 Power Up", text: "Show up. That’s how quests begin.", sub: "Start easy. Build the habit. The first win is just getting out there." },
+      { title: "Week 2 Power Up", text: "Smooth beats fast. Fast comes later.", sub: "Keep the pace chill and let the miles stack up." },
+      { title: "Week 3 Power Up", text: "You’re not chasing Dad yet. You’re building the engine.", sub: "Good runners learn patience before speed." },
+      { title: "Week 4 Power Up", text: "Recovery weeks are secret training.", sub: "This week backs off so your legs can level up." },
+      { title: "Week 5 Power Up", text: "Tiny steps. Big upgrade.", sub: "The long run gets a little longer. That’s how 10K confidence grows." },
+      { title: "Week 6 Power Up", text: "6-7 mode: not easy, not impossible.", sub: "When it feels spicy, slow down and keep moving." },
+      { title: "Week 7 Power Up", text: "Strong runners know when to chill.", sub: "This is another reset week. Finish feeling like you could do more." },
+      { title: "Week 8 Power Up", text: "Consistency is basically a cheat code.", sub: "Keep showing up and the race starts getting less scary." },
+      { title: "Week 9 Power Up", text: "Five miles changes the game.", sub: "Once you touch five, 10K starts looking very beatable." },
+      { title: "Week 10 Power Up", text: "Back off today. Come back stronger tomorrow.", sub: "Less mileage this week keeps the legs fresh for the next push." },
+      { title: "Week 11 Power Up", text: "Dad should officially be nervous.", sub: "The miles are real now. Stay relaxed and stack another win." },
+      { title: "Week 12 Power Up", text: "Tough days count double.", sub: "If it feels hard, that doesn’t mean you’re failing. It means you’re training." },
+      { title: "Week 13 Power Up", text: "Reset, don’t retreat.", sub: "This easier week is part of the plan, not a step backward." },
+      { title: "Week 14 Power Up", text: "The final boss is starting to sweat.", sub: "You’re close. Keep the effort smooth and controlled." },
+      { title: "Week 15 Power Up", text: "Six miles unlocked = serious runner energy.", sub: "The goal is no longer far away. It’s right there." },
+      { title: "Week 16 Power Up", text: "10K distance: unlocked.", sub: "This is the confidence run. Start easy and finish proud." },
+      { title: "Week 17 Power Up", text: "Sharpen the sword. Don’t drain the battery.", sub: "This week is about feeling fresh, not proving anything." },
+      { title: "Race Week Power Up", text: "Start calm. Finish legendary.", sub: "Save the turbo for the last stretch. Dad has been warned." }
+    ];
+
+    const WORKOUTS = [
+      { key: "easy", title: "Easy Run", desc: "Chill pace. Talking speed." },
+      { key: "long", title: "Long Run", desc: "Main 10K builder." },
+      { key: "optional", title: "Optional Run", desc: "Only if you’re feeling it." },
+    ];
+
+    let state = {
+      runs: loadRuns(),
+      workouts: loadWorkouts(),
+      activeWeek: getCurrentWeek(),
+      feeling: "Easy"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function loadRuns() {
+      try {
+        return JSON.parse(localStorage.getItem("asher10k:runs") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function loadWorkouts() {
+      try {
+        return JSON.parse(localStorage.getItem("asher10k:workouts") || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveRuns() {
+      localStorage.setItem("asher10k:runs", JSON.stringify(state.runs));
+      localStorage.setItem("asher10k:workouts", JSON.stringify(state.workouts));
+    }
+
+    function parseMiles(value) {
+      const n = Number.parseFloat(value);
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    }
+
+    function uid() {
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function addDays(date, days) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + days);
+      return d;
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+
+    function getWeekDates(week) {
+      const start = addDays(PLAN_START, (week - 1) * 7);
+      const end = addDays(start, 6);
+      return `${formatDate(start)}–${formatDate(end)}`;
+    }
+
+    function getCurrentWeek() {
+      const today = new Date();
+      const days = Math.floor((today - PLAN_START) / (1000 * 60 * 60 * 24));
+      return Math.min(18, Math.max(1, Math.floor(days / 7) + 1));
+    }
+
+    function daysUntilRace() {
+      const today = new Date();
+      const diff = Math.ceil((RACE_DATE - today) / (1000 * 60 * 60 * 24));
+      return Math.max(0, diff);
+    }
+
+    function planForWeek(week) {
+      return TRAINING_PLAN.find(w => w.week === Number(week)) || TRAINING_PLAN[0];
+    }
+
+    function planKey(week, key) {
+      return `week-${week}-${key}`;
+    }
+
+    function runForPlan(planId) {
+      return state.runs.find(r => r.planId === planId);
+    }
+
+    function extractMiles(workoutText) {
+      const text = String(workoutText || "").toLowerCase();
+      if (text.includes("10k")) return 6.2;
+
+      const range = text.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*mi/);
+      if (range) return Number.parseFloat(range[2]);
+
+      const single = text.match(/(\d+(?:\.\d+)?)\s*mi/);
+      if (single) return Number.parseFloat(single[1]);
+
+      return 0;
+    }
+
+    function getStats() {
+      const totalMiles = state.runs.reduce((sum, r) => sum + parseMiles(r.distanceMiles ?? r.distance), 0);
+      const longestRun = state.runs.reduce((max, r) => Math.max(max, parseMiles(r.distanceMiles ?? r.distance)), 0);
+      const completedRuns = state.runs.length;
+
+      const requiredIds = [];
+      for (let week = 1; week <= 18; week++) {
+        requiredIds.push(planKey(week, "easy"));
+        requiredIds.push(planKey(week, "long"));
+      }
+      const requiredCompleted = requiredIds.filter(id => state.workouts[id]?.status === "complete").length;
+      const requiredCompletionPct = Math.round((requiredCompleted / requiredIds.length) * 100);
+
+      const weeksWithRuns = new Set(state.runs
+        .filter(r => parseMiles(r.distanceMiles ?? r.distance) > 0)
+        .map(r => Number(r.week))
+        .filter(Boolean));
+
+      let currentStreak = 0;
+      let maxStreak = 0;
+      for (let week = 1; week <= 18; week++) {
+        if (weeksWithRuns.has(week)) {
+          currentStreak += 1;
+          maxStreak = Math.max(maxStreak, currentStreak);
+        } else {
+          currentStreak = 0;
+        }
+      }
+
+      return {
+        totalMiles,
+        longestRun,
+        completedRuns,
+        requiredCompleted,
+        requiredTotal: requiredIds.length,
+        requiredCompletionPct,
+        maxStreak
+      };
+    }
+
+    function pct(value, max) {
+      return Math.min(100, Math.max(0, (value / max) * 100));
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+
+    function getWeeklyMessage(week) {
+      const item = WEEKLY_MESSAGES[week - 1] || WEEKLY_MESSAGES[0];
+
+      if (typeof item === "string") return item;
+
+      if (item && typeof item === "object") {
+        return item.message || item.text || item.quote || item.title || "Every mile is a vote for the runner you’re becoming.";
+      }
+
+      return "Every mile is a vote for the runner you’re becoming.";
+    }
+
+    function renderWeekSelect() {
+      $("weekSelect").innerHTML = TRAINING_PLAN
+        .map(w => `<option value="${w.week}">Week ${w.week} • ${getWeekDates(w.week)}</option>`)
+        .join("");
+      $("weekSelect").value = state.activeWeek;
+    }
+
+    function renderFeelings() {
+      $("feelings").innerHTML = FEELINGS.map(f => `
+        <button class="feeling ${state.feeling === f.label ? "active" : ""}" type="button" data-feeling="${f.label}">
+          <span class="emoji">${f.emoji}</span>${f.label}
+        </button>
+      `).join("");
+
+      document.querySelectorAll(".feeling").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.feeling = btn.dataset.feeling;
+          renderFeelings();
+        });
+      });
+    }
+
+    function renderPlanTable() {
+      $("planTable").innerHTML = TRAINING_PLAN.map(w => `
+        <tr>
+          <td>${w.week}</td>
+          <td class="date-cell">${getWeekDates(w.week)}</td>
+          <td>${w.easy}</td>
+          <td>${w.long}</td>
+          <td>${w.optional}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderWeeklyMessage() {
+      const index = Math.min(17, Math.max(0, Number(state.activeWeek) - 1));
+      const message = WEEKLY_MESSAGES[index] || WEEKLY_MESSAGES[0];
+      $("messageLabel").textContent = message.title;
+      $("messageText").textContent = message.text;
+      $("messageSubtext").textContent = message.sub;
+    }
+
+    function renderStats() {
+      const stats = getStats();
+      const dadDanger = Math.min(100, Math.round((stats.longestRun / 6.2) * 80 + Math.min(stats.completedRuns, 18)));
+      const tenKProgress = Math.min(stats.longestRun, 6.2);
+      const tenKPct = pct(tenKProgress, 6.2);
+
+      $("raceDays").textContent = daysUntilRace();
+      $("totalMiles").textContent = stats.totalMiles.toFixed(1);
+      $("longestRun").textContent = `${stats.longestRun.toFixed(1)} mi`;
+      $("runsLogged").textContent = stats.completedRuns;
+
+      $("tenKPct").textContent = `${Math.round(tenKPct)}%`;
+      $("tenKFill").style.width = `${tenKPct}%`;
+
+      $("dadPct").textContent = `${dadDanger}%`;
+      $("dadFill").style.width = `${dadDanger}%`;
+    }
+
+    function renderQuestGrid() {
+      const current = planForWeek(state.activeWeek);
+      $("weekSubhead").textContent = `Week ${current.week} • ${getWeekDates(current.week)}`;
+      if ($("weeklyMessage")) $("weeklyMessage").textContent = getWeeklyMessage(current.week);
+
+      $("questGrid").innerHTML = WORKOUTS.map(w => {
+        const workoutText = current[w.key];
+        const id = planKey(current.week, w.key);
+        const status = state.workouts[id]?.status || "none";
+        const existing = runForPlan(id);
+        const plannedMiles = extractMiles(workoutText);
+        const dateVal = existing?.date || new Date().toISOString().slice(0, 10);
+        const timeVal = existing?.time || "";
+        const feelingVal = existing?.feeling || "Easy 😎";
+        const notesVal = existing?.notes || "";
+        const incompleteMilesVal = existing?.completionStatus === "incomplete" ? existing.distanceMiles : "";
+        const reasonVal = existing?.reason || existing?.notes || "";
+        const feelingOptions = FEELINGS.map(f => `${f.label} ${f.emoji}`);
+        const statusText = status === "complete" ? "Complete" : status === "incomplete" ? "Incomplete" : status === "skipped" ? "Skipped" : "Not Started";
+
+        const completeForm = status === "complete" ? `
+          <div class="completion-form" data-form="${id}">
+            <div class="two">
+              <label>
+                <span>Date</span>
+                <input type="date" data-field="date" value="${escapeHtml(dateVal)}" />
+              </label>
+              <label>
+                <span>Time</span>
+                <input data-field="time" placeholder="38:26" value="${escapeHtml(timeVal)}" />
+              </label>
+            </div>
+
+            <label>
+              <span>Feeling</span>
+              <select data-field="feeling">
+                ${feelingOptions.map(f => `<option ${f === feelingVal ? "selected" : ""}>${f}</option>`).join("")}
+              </select>
+            </label>
+
+            <label>
+              <span>Notes</span>
+              <textarea data-field="notes" placeholder="Felt good. Dad looked worried.">${escapeHtml(notesVal)}</textarea>
+            </label>
+
+            <button class="save-workout" data-save="${id}" type="button">✓ Save This Run</button>
+            <p class="tiny-note">${plannedMiles ? `This will log ${plannedMiles.toFixed(plannedMiles % 1 === 0 ? 0 : 2)} miles from the plan.` : `This workout has no mileage in the plan, so it will not add miles to the stats.`}</p>
+          </div>
+        ` : "";
+
+        const incompleteForm = status === "incomplete" ? `
+          <div class="completion-form" data-incomplete-form="${id}">
+            <div class="two">
+              <label>
+                <span>Date</span>
+                <input type="date" data-field="date" value="${escapeHtml(dateVal)}" />
+              </label>
+              <label>
+                <span>Miles Finished</span>
+                <input inputmode="decimal" data-field="completedMiles" placeholder="${plannedMiles ? plannedMiles.toFixed(plannedMiles % 1 === 0 ? 0 : 2) : "0"}" value="${escapeHtml(incompleteMilesVal)}" />
+              </label>
+            </div>
+
+            <label>
+              <span>What happened?</span>
+              <textarea data-field="reason" placeholder="Something hurt, got too tired, weather, didn’t feel right, etc.">${escapeHtml(reasonVal)}</textarea>
+            </label>
+
+            <button class="save-workout" data-save-incomplete="${id}" type="button">✓ Save Partial Run</button>
+            <p class="tiny-note">Planned: ${escapeHtml(workoutText)}. Log the miles actually completed.</p>
+          </div>
+        ` : "";
+
+        const completeSummary = existing && status === "complete" ? `
+          <div class="complete-summary">
+            Saved: ${escapeHtml(existing.date)}${existing.time ? ` • ${escapeHtml(existing.time)}` : ""} • ${escapeHtml(existing.feeling)}
+          </div>
+        ` : "";
+
+        const incompleteSummary = existing && status === "incomplete" ? `
+          <div class="complete-summary" style="color:#92400e;">
+            Saved partial: ${escapeHtml(existing.distanceMiles)} mi of ${escapeHtml(workoutText)}. Still got it — even legends have off days. Back at it next run.
+          </div>
+        ` : "";
+
+        return `
+          <div class="workout-card ${status}" data-card="${id}">
+            <div class="plan-top">
+              <div>
+                <div class="plan-title">${escapeHtml(w.title)}</div>
+                <div class="workout">${escapeHtml(workoutText)}</div>
+                <div class="desc">${escapeHtml(w.desc)}</div>
+              </div>
+              <div class="status-pill ${status}">${statusText}</div>
+            </div>
+
+            <div class="status-buttons">
+              <button type="button" class="status-button complete ${status === "complete" ? "active" : ""}" data-status="${id}|complete">Complete</button>
+              <button type="button" class="status-button incomplete ${status === "incomplete" ? "active" : ""}" data-status="${id}|incomplete">Incomplete</button>
+              <button type="button" class="status-button skipped ${status === "skipped" ? "active" : ""}" data-status="${id}|skipped">Skipped</button>
+            </div>
+
+            ${completeSummary}
+            ${incompleteSummary}
+            ${completeForm}
+            ${incompleteForm}
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-status]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const [id, status] = btn.dataset.status.split("|");
+          setWorkoutStatus(id, status);
+        });
+      });
+
+      document.querySelectorAll("[data-save]").forEach(btn => {
+        btn.addEventListener("click", () => saveWorkoutRun(btn.dataset.save));
+      });
+
+      document.querySelectorAll("[data-save-incomplete]").forEach(btn => {
+        btn.addEventListener("click", () => saveIncompleteRun(btn.dataset.saveIncomplete));
+      });
+    }
+
+    function setWorkoutStatus(id, status) {
+      if (status === "skipped") {
+        state.workouts[id] = { status: "skipped", updatedAt: new Date().toISOString() };
+        state.runs = state.runs.filter(r => r.planId !== id);
+      } else if (status === "complete") {
+        state.workouts[id] = { status: "complete", updatedAt: new Date().toISOString() };
+      } else if (status === "incomplete") {
+        state.workouts[id] = { status: "incomplete", updatedAt: new Date().toISOString() };
+      }
+
+      saveRuns();
+      render();
+    }
+
+    function saveWorkoutRun(id) {
+      const card = document.querySelector(`[data-form="${id}"]`);
+      if (!card) return;
+
+      const match = id.match(/^week-(\d+)-(easy|long|optional)$/);
+      if (!match) return;
+      const week = Number(match[1]);
+      const key = match[2];
+      const plan = planForWeek(week);
+      const workoutText = plan[key];
+      const workoutInfo = WORKOUTS.find(w => w.key === key);
+      const miles = extractMiles(workoutText);
+
+      const date = card.querySelector('[data-field="date"]').value || new Date().toISOString().slice(0, 10);
+      const time = card.querySelector('[data-field="time"]').value.trim();
+      const feeling = card.querySelector('[data-field="feeling"]').value;
+      const notes = card.querySelector('[data-field="notes"]').value.trim();
+
+      const existing = runForPlan(id);
+      const run = {
+        id: existing?.id || uid(),
+        planId: id,
+        week,
+        workoutKey: key,
+        workoutTitle: workoutInfo?.title || "Run",
+        runType: workoutInfo?.title || "Run",
+        completionStatus: "complete",
+        distanceText: workoutText,
+        distanceMiles: miles,
+        distance: miles ? miles.toFixed(miles % 1 === 0 ? 0 : 2) : "0",
+        plannedDistanceText: workoutText,
+        date,
+        time,
+        feeling,
+        notes
+      };
+
+      state.runs = [run, ...state.runs.filter(r => r.planId !== id)];
+      state.workouts[id] = { status: "complete", updatedAt: new Date().toISOString() };
+      saveRuns();
+      render();
+      setStatus("Run saved.");
+    }
+
+    function saveIncompleteRun(id) {
+      const card = document.querySelector(`[data-incomplete-form="${id}"]`);
+      if (!card) return;
+
+      const match = id.match(/^week-(\d+)-(easy|long|optional)$/);
+      if (!match) return;
+      const week = Number(match[1]);
+      const key = match[2];
+      const plan = planForWeek(week);
+      const workoutText = plan[key];
+      const workoutInfo = WORKOUTS.find(w => w.key === key);
+      const plannedMiles = extractMiles(workoutText);
+
+      const date = card.querySelector('[data-field="date"]').value || new Date().toISOString().slice(0, 10);
+      const completedMiles = parseMiles(card.querySelector('[data-field="completedMiles"]').value);
+      const reason = card.querySelector('[data-field="reason"]').value.trim();
+
+      if (!completedMiles) {
+        setStatus("Add how many miles were completed before saving.");
+        return;
+      }
+
+      const actualMiles = plannedMiles ? Math.min(completedMiles, plannedMiles) : completedMiles;
+      const existing = runForPlan(id);
+      const run = {
+        id: existing?.id || uid(),
+        planId: id,
+        week,
+        workoutKey: key,
+        workoutTitle: workoutInfo?.title || "Run",
+        runType: `${workoutInfo?.title || "Run"} — Incomplete`,
+        completionStatus: "incomplete",
+        distanceText: `${actualMiles.toFixed(actualMiles % 1 === 0 ? 0 : 2)} mi of ${workoutText}`,
+        distanceMiles: actualMiles,
+        distance: actualMiles.toFixed(actualMiles % 1 === 0 ? 0 : 2),
+        plannedDistanceText: workoutText,
+        plannedMiles,
+        date,
+        time: "",
+        feeling: "Incomplete",
+        reason,
+        notes: reason
+      };
+
+      state.runs = [run, ...state.runs.filter(r => r.planId !== id)];
+      state.workouts[id] = { status: "incomplete", updatedAt: new Date().toISOString() };
+      saveRuns();
+      render();
+      setStatus("Still got it — even legends have off days. Back at it next run.");
+    }
+
+    function renderRuns() {
+      const root = $("runList");
+
+      if (!state.runs.length) {
+        root.innerHTML = `
+          <div class="log-empty">
+            <div class="shoe">👟</div>
+            <p><b>No runs completed yet.</b></p>
+            <p>Mark a planned run complete and save it to start the quest.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const sorted = [...state.runs].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+
+      root.innerHTML = sorted.map(run => {
+        const date = new Date(`${run.date}T00:00:00`).toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        });
+
+        const milesNumber = parseMiles(run.distanceMiles ?? run.distance);
+        const milesDisplay = milesNumber
+          ? `${milesNumber.toFixed(milesNumber % 1 === 0 ? 0 : 2)} miles`
+          : escapeHtml(run.distanceText || "No miles");
+
+        return `
+          <div class="run">
+            <div>
+              <div class="tags">
+                ${run.week ? `<span class="tag">Week ${escapeHtml(run.week)}</span>` : ""}
+                <span class="tag">${escapeHtml(run.runType)}</span>
+                <span class="tag">${escapeHtml(run.feeling)}</span>
+              </div>
+              <div class="run-main">${milesDisplay} ${run.time ? `<span style="color:#94a3b8;">• ${escapeHtml(run.time)}</span>` : ""}</div>
+              <div class="run-date">${date}${run.distanceText ? ` • Plan: ${escapeHtml(run.distanceText)}` : ""}</div>
+              ${run.notes ? `<div class="run-notes">${escapeHtml(run.notes)}</div>` : ""}
+            </div>
+            <button class="delete" data-delete="${run.id}">Delete</button>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-delete]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const run = state.runs.find(r => r.id === btn.dataset.delete);
+          state.runs = state.runs.filter(r => r.id !== btn.dataset.delete);
+          if (run?.planId && state.workouts[run.planId]?.status === "complete") {
+            delete state.workouts[run.planId];
+          }
+          saveRuns();
+          render();
+        });
+      });
+    }
+
+    function renderBadges() {
+      const stats = getStats();
+
+      const badges = [
+        { unlocked: true, title: "3.5 Mile Badge", detail: "Already unlocked. Strong start.", emoji: "✅" },
+        { unlocked: stats.longestRun >= 4, title: "4 Mile Badge", detail: "Okay, this kid can run.", emoji: "🏃" },
+        { unlocked: stats.longestRun >= 5, title: "5 Mile Badge", detail: "Dad should be nervous.", emoji: "👀" },
+        { unlocked: stats.longestRun >= 6, title: "6 Mile Badge", detail: "Final boss energy.", emoji: "⚡" },
+        { unlocked: stats.longestRun >= 6.2, title: "10K Ready", detail: "6.2 miles unlocked.", emoji: "🏆" },
+
+        { unlocked: stats.completedRuns >= 10, title: "10 Runs Logged", detail: "Double-digit runner status.", emoji: "🔟" },
+        { unlocked: stats.completedRuns >= 20, title: "20 Runs Logged", detail: "That’s not luck. That’s discipline.", emoji: "💪" },
+        { unlocked: stats.completedRuns >= 30, title: "30 Runs Logged", detail: "Full quest mode activated.", emoji: "🚀" },
+
+        { unlocked: stats.maxStreak >= 2, title: "2-Week Streak", detail: "Consistency spark started.", emoji: "🔥" },
+        { unlocked: stats.maxStreak >= 4, title: "4-Week Streak", detail: "A whole month of showing up.", emoji: "📆" },
+        { unlocked: stats.maxStreak >= 8, title: "8-Week Streak", detail: "That’s serious habit power.", emoji: "🧱" },
+
+        { unlocked: stats.requiredCompletionPct >= 25, title: "25% Plan Complete", detail: `${stats.requiredCompleted}/${stats.requiredTotal} key runs done.`, emoji: "🥉" },
+        { unlocked: stats.requiredCompletionPct >= 50, title: "50% Plan Complete", detail: `${stats.requiredCompleted}/${stats.requiredTotal} key runs done.`, emoji: "🥈" },
+        { unlocked: stats.requiredCompletionPct >= 75, title: "75% Plan Complete", detail: `${stats.requiredCompleted}/${stats.requiredTotal} key runs done.`, emoji: "🥇" },
+        { unlocked: stats.requiredCompletionPct >= 100, title: "Plan Complete", detail: "Every key run checked off.", emoji: "👑" },
+
+        { unlocked: false, title: "Beat Dad Badge", detail: "Unlock on race day.", emoji: "🐐" },
+      ];
+
+      $("badges").innerHTML = badges.map(b => `
+        <div class="badge-card ${b.unlocked ? "unlocked" : "locked"}">
+          <div class="badge-emoji">${b.emoji}</div>
+          <div>
+            <div class="badge-title">${b.title}</div>
+            <div class="badge-detail">${b.detail}</div>
+            <div class="badge-status">${b.unlocked ? "Unlocked" : "Locked"}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function setStatus(message) {
+      const status = $("backupStatus");
+      if (!status) return;
+      status.textContent = message || "";
+      if (message) {
+        window.setTimeout(() => {
+          if (status.textContent === message) status.textContent = "";
+        }, 5000);
+      }
+    }
+
+    function exportRuns() {
+      const today = new Date().toISOString().slice(0, 10);
+      const backup = {
+        app: "Asher's 10K Quest Tracker",
+        version: 3,
+        exportedAt: new Date().toISOString(),
+        runs: state.runs,
+        workouts: state.workouts
+      };
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `asher-10k-runs-backup-${today}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      setStatus("Backup file created. Save it somewhere safe.");
+    }
+
+    function importRunsFromFile(file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const importedRuns = Array.isArray(parsed) ? parsed : parsed.runs;
+          const importedWorkouts = parsed.workouts || {};
+
+          if (!Array.isArray(importedRuns)) {
+            setStatus("That backup file did not contain a runs list.");
+            return;
+          }
+
+          const replace = confirm(`Restore ${importedRuns.length} runs from backup? This will replace the runs currently saved on this iPad.`);
+          if (!replace) return;
+
+          state.runs = importedRuns.map(r => ({
+            id: r.id || uid(),
+            planId: r.planId || "",
+            week: r.week || "",
+            workoutKey: r.workoutKey || "",
+            workoutTitle: r.workoutTitle || r.runType || "Run",
+            runType: r.runType || r.workoutTitle || "Run",
+            distanceText: r.distanceText || r.distance || "",
+            distanceMiles: parseMiles(r.distanceMiles || r.distance),
+            distance: String(parseMiles(r.distanceMiles || r.distance)),
+            date: r.date || new Date().toISOString().slice(0, 10),
+            time: r.time || "",
+            feeling: r.feeling || "Easy 😎",
+            notes: r.notes || ""
+          }));
+
+          state.workouts = importedWorkouts;
+          saveRuns();
+          render();
+          setStatus(`Restored ${state.runs.length} runs from backup.`);
+        } catch (error) {
+          setStatus("Could not read that backup file.");
+        } finally {
+          $("importFile").value = "";
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    function createSummary() {
+      const stats = getStats();
+      const tenKPct = Math.round(pct(Math.min(stats.longestRun, 6.2), 6.2));
+      const sorted = [...state.runs].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      const latest = sorted[0];
+      const recentRuns = sorted.slice(0, 5);
+
+      let summary = `Asher 10K Progress Update\n`;
+      summary += `Runs completed: ${stats.completedRuns}\n`;
+      summary += `Total plan miles completed: ${stats.totalMiles.toFixed(1)}\n`;
+      summary += `Longest run: ${stats.longestRun.toFixed(1)} mi\n`;
+      summary += `Progress to 10K distance: ${tenKPct}%\n`;
+
+      if (latest) {
+        summary += `Latest run: ${latest.week ? `Week ${latest.week}, ` : ""}${latest.runType}, ${latest.distanceText || latest.distance + " mi"}`;
+        if (latest.time) summary += ` in ${latest.time}`;
+        summary += `, felt ${latest.feeling}`;
+        if (latest.notes) summary += ` — ${latest.notes}`;
+        summary += `\n`;
+      }
+
+      if (recentRuns.length) {
+        summary += `\nRecent completed runs:\n`;
+        recentRuns.forEach(run => {
+          summary += `- ${run.date}: ${run.week ? `Week ${run.week}, ` : ""}${run.runType}, ${run.distanceText || run.distance + " mi"}`;
+          if (run.time) summary += `, ${run.time}`;
+          summary += `, ${run.feeling}`;
+          if (run.notes) summary += ` — ${run.notes}`;
+          summary += `\n`;
+        });
+      }
+
+      summary += `\nGive me recommendations for what to do next.`;
+      return summary;
+    }
+
+    async function copySummary() {
+      const summary = createSummary();
+
+      try {
+        await navigator.clipboard.writeText(summary);
+        setStatus("Progress summary copied. Paste it into ChatGPT when you want coaching.");
+      } catch {
+        window.prompt("Copy this progress summary:", summary);
+        setStatus("Copy the summary from the popup.");
+      }
+    }
+
+    function render() {
+      renderWeeklyMessage();
+      renderStats();
+      renderQuestGrid();
+      renderRuns();
+      renderBadges();
+    }
+
+    function init() {
+      renderWeekSelect();
+      renderPlanTable();
+      render();
+
+      $("weekSelect").addEventListener("change", (e) => {
+        state.activeWeek = Number(e.target.value);
+        render();
+      });
+
+      $("exportButton").addEventListener("click", exportRuns);
+      $("importButton").addEventListener("click", () => $("importFile").click());
+      $("importFile").addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) importRunsFromFile(file);
+      });
+      $("summaryButton").addEventListener("click", copySummary);
+    }
+
+    init();
+  </script>
+</body>
+</html>
